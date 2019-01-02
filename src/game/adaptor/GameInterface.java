@@ -13,4 +13,6 @@ public interface GameInterface {
 	public void setGesture(long id,Gesture gesture);
 	public Player findById(long id);
 	public void removeById(long id);
+	
+	
 }

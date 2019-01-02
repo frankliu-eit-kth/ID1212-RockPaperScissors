@@ -1,8 +1,9 @@
 package net.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Message {
+public class Message implements Serializable{
 	//private final String MSG_DELIMETER="##";
 	private String header;
 	private ArrayList<String> body;

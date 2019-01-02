@@ -17,7 +17,7 @@ import java.util.List;
 
 public class ForkNode {
 	private ServerSocket forkHandle;
-	private ArrayList<Socket> forkBranches;
+	private ArrayList<ServerConnection> forkBranches;
 	private final List<ClientListener> clientHandlers = new ArrayList<>();
 	private InetId thisAddress;
 	private final InetId bootstrapAddress=new InetId("127.0.0.1",8080);
@@ -28,7 +28,7 @@ public class ForkNode {
     private static final int TIMEOUT_HALF_MINUTE = 30000;
     private boolean bootstrapped=false;
     private boolean running=false;
-    private static final String SERVER_ADDRESS_CLASS_NAME="net.model.ServerAddress";
+    private static final String SERVER_ADDRESS_CLASS_NAME="net.model.InetId";
     private static final String MESSAGE_CLASS_NAME="net.model.Message";
     
     public ForkNode(int serverPort,MsgHandler msgHandler) {
@@ -40,7 +40,7 @@ public class ForkNode {
 		 } catch (IOException e) {
 	            System.err.println("Server failure.");
 	        }
-		this.forkBranches=new ArrayList<Socket>();
+		this.forkBranches=new ArrayList<>();
 		System.out.println("node inited, server socket created");
 		startServerSocket(forkHandle);
 		System.out.println("server running");
@@ -49,29 +49,16 @@ public class ForkNode {
 	}
     
     
-    public void broadcastMsg(Object obj) {
-    	try {
-			for(Socket branch: forkBranches) {
-				ObjectOutputStream toPeer=new ObjectOutputStream(branch.getOutputStream());
-				toPeer.writeObject(obj);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    public void broadcastMsg(Object msg) {
+    	for(ServerConnection conn:forkBranches) {
+			conn.send(msg);
+    	}
     }
     public void stop(Object quitMsg) {
     	this.running=false;
     	broadcastMsg(quitMsg);
-    	for(Socket branch: forkBranches) {
-    		try {
-				branch.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		forkBranches.remove(branch);
-    		branch=null;
+    	for(ServerConnection conn:forkBranches) {
+    		conn.stop();
     	}
     }
     
@@ -98,18 +85,17 @@ public class ForkNode {
 		}
 
 	private void initNewForkBranch(InetId serverAddress) throws Exception {
-		Socket socket = new Socket();
+		
         try {
-        	forkBranches.add(socket);
-        	
-			socket.connect(new InetSocketAddress(serverAddress.ip, serverAddress.port), TIMEOUT_HALF_MINUTE);
+        	ServerConnection newBranch=new ServerConnection(serverAddress);
+        	forkBranches.add(newBranch);
+        	Socket socket = newBranch.getSocket();
 			socket.setSoTimeout(TIMEOUT_HALF_HOUR);
-			ObjectOutputStream toServer = new ObjectOutputStream(socket.getOutputStream());
+			
 			System.out.println("new branch created, to"+ socket.getPort());
-			toServer.writeObject(thisAddress);
+			newBranch.send(thisAddress);
 			System.out.println("sent local server address to new peer's server");
-			toServer.flush();
-	        toServer.reset();
+			
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -131,17 +117,24 @@ public class ForkNode {
 	private class ClientListener implements Runnable{
 		private Socket clientSocket;
 		private MsgHandler msgHandler;
+		private ObjectInputStream fromPeer;
 		public ClientListener(Socket clientSocket,MsgHandler handler) {
 			this.clientSocket=clientSocket;
 			this.msgHandler=handler;
+			try {
+				this.fromPeer=new ObjectInputStream(this.clientSocket.getInputStream());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
 			try {
                 for (;;) {
-                	ObjectInputStream fromServer=new ObjectInputStream(this.clientSocket.getInputStream());
-                    Object msg=fromServer.readObject();
+                	
+                    Object msg=fromPeer.readObject();
                     System.out.println("received new ojb:"+msg.getClass().getName());
                     if(msg.getClass().getName().equals(SERVER_ADDRESS_CLASS_NAME)) {
                     	InetId newAddress=(InetId)msg;
@@ -149,9 +142,10 @@ public class ForkNode {
                     	String newIp=newAddress.ip;
                     	int newPort=newAddress.port;
                     	boolean flag=false;
-                    	for(Socket branch:forkBranches) {
+                    	for(ServerConnection branch:forkBranches) {
+                    		Socket socket=branch.getSocket();
                     		//System.out.println(branch.getInetAddress().getHostAddress());
-                    		if(branch.getInetAddress().getHostAddress().equals(newIp)&&branch.getPort()==newPort) {
+                    		if(socket.getInetAddress().getHostAddress().equals(newIp)&&socket.getPort()==newPort) {
                     			flag=true;
                     		}
                     	}
@@ -159,9 +153,8 @@ public class ForkNode {
                     		System.out.println("new address received, creating new branch");
                     		initNewForkBranch(newAddress);
                     		
-                    		for(Socket branch:forkBranches) {
-                    			ObjectOutputStream toPeer=new ObjectOutputStream(branch.getOutputStream());
-                    			toPeer.writeObject(newAddress);
+                    		for(ServerConnection branch:forkBranches) {
+                    			branch.send(newAddress);
                     		}
                     	}
                     }else {
@@ -169,7 +162,7 @@ public class ForkNode {
                     		InetId netId=new InetId(this.clientSocket.getInetAddress().toString(),this.clientSocket.getPort());
                     		msgHandler.handleMsg((Message)msg,netId);
                     	}else {
-                    		throw new Exception("unknown message type");
+                    		throw new Exception("unknown message type "+msg.getClass().getName());
                     	}
                     	
                     }
@@ -199,4 +192,49 @@ public class ForkNode {
 			}
 		}
 	}
+	private class ServerConnection {
+		private Socket clientSocket;
+		private ObjectOutputStream toPeer;
+		private boolean connected=false;
+		
+		public ServerConnection(InetId serverAddress) {
+			// TODO Auto-generated constructor stub
+			try {
+				this.clientSocket=new Socket();
+				this.clientSocket.connect(new InetSocketAddress(serverAddress.ip, serverAddress.port), TIMEOUT_HALF_MINUTE);
+				connected=true;
+				//boolean autoFlush = true;
+				this.toPeer=new ObjectOutputStream(clientSocket.getOutputStream());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		public void send(Object msg) {
+			try {
+				toPeer.writeObject(msg);
+				toPeer.flush();
+				toPeer.reset();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		public void stop() {
+			try {
+				toPeer.close();
+				clientSocket.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		public Socket getSocket() {
+			return this.clientSocket;
+		}
+
+	}
+
 }

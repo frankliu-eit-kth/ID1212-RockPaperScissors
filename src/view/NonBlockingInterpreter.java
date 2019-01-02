@@ -51,8 +51,8 @@ public class NonBlockingInterpreter implements Runnable {
                         netController.stop(msg);
                         break;
                     case CONNECT:
-                        if(!netController.nodeStarted()) {
-                        	String str=cmdLine.getParameter(1);
+                        if(netController==null) {
+                        	String str=cmdLine.getParameter(0);
                         	if(str!=null) {
                         		int portNo=Integer.parseInt(str);
                         		NetMsgInterpreter msgHandler=new NetMsgInterpreter(this.gameController,new ScreenOutput());
@@ -63,15 +63,12 @@ public class NonBlockingInterpreter implements Runnable {
                         }
                         break;
                     case USERNAME:
-                    	if(cmdLine.getParameter(1)!=null) {
+                    	if(cmdLine.getParameter(0)!=null) {
                     		ArrayList<String> tempList=new ArrayList<String>();
-                    		tempList.add(cmdLine.getParameter(1));
+                    		tempList.add(cmdLine.getParameter(0));
                     		Message userNameMsg=new Message("USERNAME",tempList);
                     		netController.broadcast(userNameMsg);
                     	}       
-                        break;
-                    case START:
-                        netController.broadcast(new Message("START",null));
                         break;
                     case JOIN:
                     	netController.broadcast(new Message("JOIN",null));
@@ -92,7 +89,7 @@ public class NonBlockingInterpreter implements Runnable {
                         throw new Exception("unknown command");
                 }
             } catch (Exception e) {
-                outMgr.println("Operation failed");
+               e.printStackTrace();
             }
         }
     }
