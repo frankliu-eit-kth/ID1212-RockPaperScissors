@@ -3,6 +3,11 @@ package net.model;
 import java.io.Serializable;
 
 public class InetId implements Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public String ip;
 	public int port;
 	public InetId(String ip , int port) {

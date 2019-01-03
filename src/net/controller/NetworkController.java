@@ -4,12 +4,9 @@ import net.model.ForkNode;
 import net.model.MsgHandler;
 
 public class NetworkController {
+	
 	private ForkNode thisNode;
 	private MsgHandler msgHandler;
-	
-	public boolean nodeStarted() {
-		return thisNode!=null;
-	}
 	
 	public NetworkController(int portNo, MsgHandler msgHandler) {
 		this.msgHandler=msgHandler;

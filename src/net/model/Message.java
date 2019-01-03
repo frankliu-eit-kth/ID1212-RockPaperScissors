@@ -5,6 +5,11 @@ import java.util.ArrayList;
 
 public class Message implements Serializable{
 	//private final String MSG_DELIMETER="##";
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2L;
 	private String header;
 	private ArrayList<String> body;
 	
