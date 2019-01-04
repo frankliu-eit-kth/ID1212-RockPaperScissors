@@ -1,4 +1,4 @@
-package net.model;
+package net.common;
 
 import java.io.Serializable;
 
@@ -8,11 +8,13 @@ public class InetId implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	public long id;
 	public String ip;
 	public int port;
 	public InetId(String ip , int port) {
 		this.ip=ip;
 		this.port=port;
+		this.id=System.currentTimeMillis();
 	}
 	@Override
 	public String toString() {

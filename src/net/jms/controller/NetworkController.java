@@ -1,20 +1,21 @@
-package net.controller;
+package net.jms.controller;
 
-import net.model.ForkNode;
-import net.model.MsgHandler;
+import java.io.Serializable;
+
+import net.common.GameMsgHandler;
+import net.jms.model.ForkNode;
 
 public class NetworkController {
-	
 	private ForkNode thisNode;
-	private MsgHandler msgHandler;
+	private GameMsgHandler msgHandler;
 	
-	public NetworkController(int portNo, MsgHandler msgHandler) {
+	public NetworkController(int portNo, GameMsgHandler msgHandler) {
 		this.msgHandler=msgHandler;
 		thisNode=new ForkNode(portNo, msgHandler);
 	}
 	
 	
-	public void broadcast(Object msg) {
+	public void broadcast(Serializable msg) {
 		try {
 			thisNode.broadcastMsg(msg);
 		} catch (NullPointerException e) {
@@ -23,10 +24,12 @@ public class NetworkController {
 		}
 	}
 	
-	public void stop(Object quitMsg) {
+	public void stop(Serializable quitMsg) {
 		if(thisNode!=null) {
 			thisNode.stop(quitMsg);
 		}
 	}
+	
+	
 
 }

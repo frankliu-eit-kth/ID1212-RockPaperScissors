@@ -5,11 +5,11 @@ import game.controller.GameController;
 import game.model.Gesture;
 import game.model.Player;
 import game.model.PlayerStatus;
-import net.model.InetId;
-import net.model.Message;
-import net.model.MsgHandler;
+import net.common.InetId;
+import net.common.NetMessage;
+import net.common.GameMsgHandler;
 
-public class NetMsgInterpreter implements MsgHandler {
+public class NetMsgInterpreter implements GameMsgHandler {
 	GameController gameController;
 	ConsoleOutput output;
 	
@@ -20,10 +20,10 @@ public class NetMsgInterpreter implements MsgHandler {
 	}
 	
 	@Override
-	public void handleMsg(Message msg, InetId netId)  {
+	public void handleMsg(NetMessage msg, InetId netId)  {
 		// TODO Auto-generated method stub
 		String header=msg.getHeader().toLowerCase();
-		long id=netId.hashCode();
+		long id=netId.id;
 		Player player=null;
 		try {
 			switch(header) {

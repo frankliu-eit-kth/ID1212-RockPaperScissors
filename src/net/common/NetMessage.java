@@ -1,9 +1,9 @@
-package net.model;
+package net.common;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Message implements Serializable{
+public class NetMessage implements Serializable{
 	//private final String MSG_DELIMETER="##";
 	
 	/**
@@ -13,7 +13,7 @@ public class Message implements Serializable{
 	private String header;
 	private ArrayList<String> body;
 	
-	public Message(String header, ArrayList<String> body) {
+	public NetMessage(String header, ArrayList<String> body) {
 		this.header=header;
 		this.body=body;
 	}

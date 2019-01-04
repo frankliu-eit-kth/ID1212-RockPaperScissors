@@ -1,4 +1,4 @@
-package net.model;
+package net.socket.model;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -10,13 +10,17 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import net.common.InetId;
+import net.common.Message;
+import net.common.GameMsgHandler;
 /**
  * io stream not flush or reset
  * @author m1339
  *
  */
 
-public class ForkNode {
+public class ForkNode_old {
 	
 	private ServerSocket forkHandle;
 	private final List<ClientListener> clientHandlers = new ArrayList<>();
@@ -26,7 +30,7 @@ public class ForkNode {
 	private InetId thisAddress;
 	private final InetId bootstrapAddress=new InetId("localhost",8080);
 	
-	private MsgHandler msgHandler;
+	private GameMsgHandler msgHandler;
 	
 	private static final int LINGER_TIME = 5000;
     private static final int TIMEOUT_HALF_HOUR = 1800000;
@@ -40,7 +44,7 @@ public class ForkNode {
     
    
     
-    public ForkNode(int serverPort,MsgHandler msgHandler) {
+    public ForkNode_old(int serverPort,GameMsgHandler msgHandler) {
 		
     	this.thisAddress=new InetId("127.0.0.1", serverPort);
 		this.msgHandler=msgHandler;
@@ -126,10 +130,10 @@ public class ForkNode {
 	private class ClientListener implements Runnable{
 		
 		private Socket clientSocket;
-		private MsgHandler msgHandler;
+		private GameMsgHandler msgHandler;
 		private ObjectInputStream fromPeer;
 		
-		public ClientListener(Socket clientSocket,MsgHandler handler) {
+		public ClientListener(Socket clientSocket,GameMsgHandler handler) {
 			this.clientSocket=clientSocket;
 			this.msgHandler=handler;
 			try {

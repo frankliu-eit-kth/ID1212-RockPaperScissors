@@ -5,8 +5,8 @@ import java.util.Scanner;
 
 import game.controller.ConsoleOutput;
 import game.controller.GameController;
-import net.controller.NetworkController;
-import net.model.Message;
+import net.common.NetMessage;
+import net.jms.controller.NetworkController;
 
 /**
  * Reads and interprets user commands. The command interpreter will run in a separate thread, which
@@ -47,7 +47,7 @@ public class NonBlockingInterpreter implements Runnable {
                 switch (cmdLine.getCmd()) {
                     case QUIT:
                         receivingCmds = false;
-                        Message msg=new Message("quit",null);
+                        NetMessage msg=new NetMessage("quit",null);
                         netController.stop(msg);
                         break;
                     case CONNECT:
@@ -66,24 +66,24 @@ public class NonBlockingInterpreter implements Runnable {
                     	if(cmdLine.getParameter(0)!=null) {
                     		ArrayList<String> tempList=new ArrayList<String>();
                     		tempList.add(cmdLine.getParameter(0));
-                    		Message userNameMsg=new Message("USERNAME",tempList);
+                    		NetMessage userNameMsg=new NetMessage("USERNAME",tempList);
                     		netController.broadcast(userNameMsg);
                     	}       
                         break;
                     case JOIN:
-                    	netController.broadcast(new Message("JOIN",null));
+                    	netController.broadcast(new NetMessage("JOIN",null));
                     	break;
                     case READY:
-                    	netController.broadcast(new Message("READY",null));
+                    	netController.broadcast(new NetMessage("READY",null));
                     	break;
                     case ROCK:
-                    	netController.broadcast(new Message("ROCK",null));
+                    	netController.broadcast(new NetMessage("ROCK",null));
                     	break;
                     case PAPER:
-                    	netController.broadcast(new Message("PAPER",null));
+                    	netController.broadcast(new NetMessage("PAPER",null));
                     	break;
                     case SCISSORS:
-                    	netController.broadcast(new Message("SCISSORS",null));
+                    	netController.broadcast(new NetMessage("SCISSORS",null));
                     	break;
                     default:
                         throw new Exception("unknown command");
