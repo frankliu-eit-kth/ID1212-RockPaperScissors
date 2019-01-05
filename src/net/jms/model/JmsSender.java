@@ -55,10 +55,12 @@ public class JmsSender {
 			this.sender = session.createProducer(destination);
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
+			System.out.println("cannot connect to new node");
 			e.printStackTrace();
 			this.close();
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
+			System.out.println("cannot connect to new node");
 			e.printStackTrace();
 			this.close();
 		}
@@ -86,7 +88,9 @@ public class JmsSender {
 			this.sender.send(newMsg);
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
+			System.out.println("error sending message");
 			e.printStackTrace();
+			this.close();
 		}
 	}
 	public static void main(String[] args) {

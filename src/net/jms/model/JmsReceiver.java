@@ -30,32 +30,49 @@ public class JmsReceiver implements Runnable {
     private Session session;
     private GameMsgHandler msgHandler;
     private AddressMsgHandler addressHandler;
+    private volatile boolean running;
     
     @Override
     public void run(){
+    	
     	if(this.receiver==null||this.msgHandler==null||this.addressHandler==null) {
     		System.out.println("system error");
     		this.close();
     		return;
     	}
-    	while(true) {
+    	
+    	while(running) {
     		try {
 				Message msg=receiver.receive();
-				String msgClassName=msg.getJMSType();
-				ObjectMessage objectmessage = (ObjectMessage)msg;
-				Object obj=objectmessage.getObject();
-				if(msgClassName.equals(InetId.class.getName())) {
-					this.addressHandler.handleAddress((InetId)obj);
+				//System.out.println(msg.toString());
+				String msgClassName=null;
+			
+				Object obj;
+				try {
+					msgClassName = msg.getJMSType();
 					
-				}else {
-					if(msgClassName.equals(NetMessage.class.getName())) {
-						this.msgHandler.handleMsg((NetMessage)obj,destServer);
+					//System.out.println(msgClassName);
+					ObjectMessage objectmessage = (ObjectMessage)msg;
+					obj = objectmessage.getObject();
+					if(msgClassName.equals(InetId.class.getName())) {
+						this.addressHandler.handleAddress((InetId)obj);
+						
+					}else {
+						if(msgClassName.equals(NetMessage.class.getName())) {
+							this.msgHandler.handleMsg((NetMessage)obj);
+						}
 					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					close();
 				}
+				
 			} catch (JMSException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				this.close();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
     		
     		
@@ -64,6 +81,7 @@ public class JmsReceiver implements Runnable {
     }
     
 	public JmsReceiver(InetId serverAddress,String topic,GameMsgHandler msgHandler,AddressMsgHandler addressHandler) {
+		this.running=true;
 		this.msgHandler=msgHandler;
 		this.addressHandler=addressHandler;
 		this.destServer=serverAddress;
@@ -77,6 +95,7 @@ public class JmsReceiver implements Runnable {
 	    String addressString= "tcp://"+ip+":"+port+"/";
 	    properties.put(Context.PROVIDER_URL,addressString);
 	    System.out.println("test: property"+addressString);
+	    
 	    try {
 			this.context = new InitialContext(properties);
 			
@@ -88,33 +107,43 @@ public class JmsReceiver implements Runnable {
 			this.receiver = session.createConsumer(destination);
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
+			System.out.println("node intialization error, please check the input");
 			e.printStackTrace();
 			this.close();
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
+			System.out.println("node intialization error, please check the input");
 			e.printStackTrace();
 			this.close();
 		}
 	}
 	
 	public void close() {
-		try {
-			if (receiver != null) receiver.close();
-			if (connection != null) connection.close();
-			if (context != null) context.close();
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NamingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		this.running = false;
+		if (context != null) {
+            try {
+                context.close();
+            } catch (NamingException exception) {
+                exception.printStackTrace();
+            }
+        }
+
+        // close the connection
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (JMSException exception) {
+                exception.printStackTrace();
+            }
+        }
 	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		InetId server=new InetId("localhost",3035);
 		JmsReceiver receiver=new JmsReceiver(server, "topic1", null,null);
 		new Thread(receiver).start();
+		receiver.close();
 	}
 	
 	

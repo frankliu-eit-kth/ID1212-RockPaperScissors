@@ -20,14 +20,15 @@ public class NetMsgInterpreter implements GameMsgHandler {
 	}
 	
 	@Override
-	public void handleMsg(NetMessage msg, InetId netId)  {
+	public void handleMsg(NetMessage msg)  {
 		// TODO Auto-generated method stub
 		String header=msg.getHeader().toLowerCase();
-		long id=netId.id;
-		Player player=null;
+		long id=msg.getFromAddresss().id;
+		
 		try {
 			switch(header) {
 				case "join":
+					System.out.println("test: player id"+id);
 					if(!checkId(id)) {
 						Player newPlayer=new Player();
 						newPlayer.setId(id);

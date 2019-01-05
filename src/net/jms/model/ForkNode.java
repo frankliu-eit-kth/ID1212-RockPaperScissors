@@ -1,13 +1,12 @@
 package net.jms.model;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 import net.common.AddressMsgHandler;
 import net.common.GameMsgHandler;
 import net.common.InetId;
+import net.common.NetMessage;
 
 public class ForkNode {
 	private JmsReceiver receiver=null;;
@@ -29,23 +28,29 @@ public class ForkNode {
 		this.senders=new HashMap<Long,JmsSender>();
 		
 		
-            this.receiver=new JmsReceiver(thisAddress, TOPIC, msgHandler, addressHandler);
-            new Thread(receiver).start();
-            System.out.println("start listening to server");
-            initNewForkBranch(thisAddress);
-            System.out.println("node inited");
+        this.receiver=new JmsReceiver(thisAddress, TOPIC, msgHandler, addressHandler);
+        new Thread(receiver).start();
+        System.out.println("start listening to server");
+        //initNewForkBranch(thisAddress);
+        System.out.println("node inited");
 		 
 		System.out.println("bootstrpping");
 		bootstrap();
 	}
 	
-	 public void broadcastMsg(Serializable msg) {
+	 public void broadcastMsg(NetMessage msg) {
+		 msg.setFromAddresss(thisAddress);
 	    	for(Entry<Long,JmsSender> sender:senders.entrySet()) {
 				sender.getValue().sendMsg(msg);
 	    	}
 	 }
+	 public void broadcastAddress(InetId msg) {
+		 for(Entry<Long,JmsSender> sender:senders.entrySet()) {
+				sender.getValue().sendMsg(msg);
+	    	}
+	 }
 	 
-	 public void stop(Serializable quitMsg) {
+	 public void stop(NetMessage quitMsg) {
 	    	this.running=false;
 	    	broadcastMsg(quitMsg);
 	    	for(Entry<Long,JmsSender> sender:senders.entrySet()) {
@@ -56,14 +61,9 @@ public class ForkNode {
 			if(this.bootstrapped) {
 				return;
 			}
-			try {
-				initNewForkBranch(bootstrapAddress);
-				System.out.println("bootstrapped");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			this.bootstrapped=true;
+			
+			initNewForkBranch(bootstrapAddress);
+			System.out.println("bootstrapped");
 	}
 	 private void initNewForkBranch(InetId serverAddress)  {
 
@@ -89,7 +89,7 @@ public class ForkNode {
 			}
 			if(flag==false) {
 				initNewForkBranch(newAddress);
-				broadcastMsg(newAddress);
+				broadcastAddress(newAddress);
 			}
 		}
 	 }

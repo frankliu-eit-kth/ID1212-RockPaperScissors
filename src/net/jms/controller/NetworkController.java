@@ -1,8 +1,7 @@
 package net.jms.controller;
 
-import java.io.Serializable;
-
 import net.common.GameMsgHandler;
+import net.common.NetMessage;
 import net.jms.model.ForkNode;
 
 public class NetworkController {
@@ -15,7 +14,7 @@ public class NetworkController {
 	}
 	
 	
-	public void broadcast(Serializable msg) {
+	public void broadcastMsg(NetMessage msg) {
 		try {
 			thisNode.broadcastMsg(msg);
 		} catch (NullPointerException e) {
@@ -24,7 +23,7 @@ public class NetworkController {
 		}
 	}
 	
-	public void stop(Serializable quitMsg) {
+	public void stop(NetMessage quitMsg) {
 		if(thisNode!=null) {
 			thisNode.stop(quitMsg);
 		}

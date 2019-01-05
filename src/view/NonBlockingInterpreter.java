@@ -47,7 +47,7 @@ public class NonBlockingInterpreter implements Runnable {
                 switch (cmdLine.getCmd()) {
                     case QUIT:
                         receivingCmds = false;
-                        NetMessage msg=new NetMessage("quit",null);
+                        NetMessage msg=new NetMessage("quit",null,null);
                         netController.stop(msg);
                         break;
                     case CONNECT:
@@ -66,24 +66,24 @@ public class NonBlockingInterpreter implements Runnable {
                     	if(cmdLine.getParameter(0)!=null) {
                     		ArrayList<String> tempList=new ArrayList<String>();
                     		tempList.add(cmdLine.getParameter(0));
-                    		NetMessage userNameMsg=new NetMessage("USERNAME",tempList);
-                    		netController.broadcast(userNameMsg);
+                    		NetMessage userNameMsg=new NetMessage("USERNAME",tempList,null);
+                    		netController.broadcastMsg(userNameMsg);
                     	}       
                         break;
                     case JOIN:
-                    	netController.broadcast(new NetMessage("JOIN",null));
+                    	netController.broadcastMsg(new NetMessage("JOIN",null,null));
                     	break;
                     case READY:
-                    	netController.broadcast(new NetMessage("READY",null));
+                    	netController.broadcastMsg(new NetMessage("READY",null,null));
                     	break;
                     case ROCK:
-                    	netController.broadcast(new NetMessage("ROCK",null));
+                    	netController.broadcastMsg(new NetMessage("ROCK",null,null));
                     	break;
                     case PAPER:
-                    	netController.broadcast(new NetMessage("PAPER",null));
+                    	netController.broadcastMsg(new NetMessage("PAPER",null,null));
                     	break;
                     case SCISSORS:
-                    	netController.broadcast(new NetMessage("SCISSORS",null));
+                    	netController.broadcastMsg(new NetMessage("SCISSORS",null,null));
                     	break;
                     default:
                         throw new Exception("unknown command");
