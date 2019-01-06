@@ -13,7 +13,7 @@ import net.model.GameMessage;
  * @author Liming Liu
  *
  */
-public class TestNetMessage {
+public class NetMessageTest {
 
 	@Test
 	public void test() {

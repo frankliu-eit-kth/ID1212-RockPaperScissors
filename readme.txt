@@ -40,7 +40,12 @@
 
 @How to run:
 	(see in folder User guide)
+	run startup.bat in openjms/bin to start JMS server
 
+@UnitTest before running main thread:
+	run unitTest.TestLauncher to test the communication
+	test success proves the sender and receiver works well, else there might be something wrong with the JMS server, check if it's running and if yes check if the port is 3035
+	
 @Code structure:
 	In general the project is managed in a traditional MVC structure:
 	
@@ -64,6 +69,8 @@
 	-> view level reads the new message
 	-> action by game controller
 	-> pass game result to view layer for console display
+	
+
 	
 
 	

@@ -13,7 +13,7 @@ import net.model.GameMessage;
  * @author Liming Liu
  *
  */
-public class TestAddress {
+public class AddressTest {
 
 	@Test
 	public void test() {

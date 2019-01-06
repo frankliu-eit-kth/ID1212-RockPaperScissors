@@ -9,7 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
  *
  */
 @RunWith(Suite.class)
-@SuiteClasses({ TestAddress.class, TestNetMessage.class })
+@SuiteClasses({ AddressTest.class, NetMessageTest.class })
 public class TestLauncher {
 
 }
