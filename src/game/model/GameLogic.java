@@ -1,16 +1,36 @@
 package game.model;
 
 import java.util.ArrayList;
-
+/**
+ * The game logic for rock paper scissors game
+ * 
+ * @author Liming Liu
+ *
+ */
 public class GameLogic {
-	public ArrayList<Player> gameOn(ArrayList<Player> players) throws Exception{
-		GestureComparator comparator=new GestureComparator();
+	/**
+	 * pass the player list, for each player: compare with every other player, add or deduct score according to the result of each pair
+	 * rule: for each pari, winner gets 1 point, loser lose 1 point, even result gets 0 point
+	 * @param players
+	 * @return
+	 * @throws Exception
+	 */
+	public ArrayList<Player> oneRound(ArrayList<Player> players) throws Exception{
+		
+		
+		HandGestureComparator comparator=new HandGestureComparator();
 		
 		for(Player p1:players) {
+			if(p1.getGesture()==null) {
+				continue;
+			}
 			int scoreP1=p1.getScore();
 			for(Player p2: players) {
-				Gesture gestureP1=p1.getGesture();
-				Gesture gestureP2=p2.getGesture();
+				if(p2.getGesture()==null) {
+					continue;
+				}
+				HandGesture gestureP1=p1.getGesture();
+				HandGesture gestureP2=p2.getGesture();
 				if(gestureP1==null||gestureP2==null) {
 					throw new Exception("null gesture");
 				}
@@ -23,38 +43,6 @@ public class GameLogic {
 		return players;
 	}
 	
-	public static void main(String args[]) throws Exception{
-		ArrayList<Player> players=new ArrayList<Player>();
-		GameLogic gl=new GameLogic();
-		/*
-		Player p1=new Player(1,0,Gesture.PAPER);
-		Player p2=new Player(2,0,Gesture.ROCK);
-		Player p3=new Player(3,0,Gesture.PAPER);
-		players.add(p1);
-		players.add(p2);
-		players.add(p3);
-		System.out.println(p1.toString());
-		System.out.println(p2.toString());
-		System.out.println(p3.toString());
-		gl.gameOn(players);
-		System.out.println(p1.toString());
-		System.out.println(p2.toString());
-		System.out.println(p3.toString());
-		p1.setCurrentGesture(Gesture.PAPER);
-		p2.setCurrentGesture(Gesture.SCISSORS);
-		p3.setCurrentGesture(Gesture.PAPER);
-		gl.gameOn(players);
-		System.out.println(p1.toString());
-		System.out.println(p2.toString());
-		System.out.println(p3.toString());
-		p1.setCurrentGesture(Gesture.ROCK);
-		p2.setCurrentGesture(Gesture.ROCK);
-		p3.setCurrentGesture(Gesture.ROCK);
-		gl.gameOn(players);
-		System.out.println(p1.toString());
-		System.out.println(p2.toString());
-		System.out.println(p3.toString());
-		*/
-	}
+	
 	
 }

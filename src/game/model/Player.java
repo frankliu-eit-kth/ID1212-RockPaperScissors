@@ -1,11 +1,36 @@
 package game.model;
-
+/**
+ * class player
+ * @author Liming Liu
+ *
+ */
 public class Player {
+	
 	private long id;
+	
 	private String name;
+	
 	private int score;
+	
 	private PlayerStatus status;
-	private Gesture gesture;
+	
+	private HandGesture gesture;
+	/**
+	 * reset player status and gesture after 1 round
+	 */
+	public void reset() {
+		if(this.status==PlayerStatus.GESTURED) {
+			this.status=PlayerStatus.JOINED;
+			this.gesture=null;
+		}
+	}
+	
+	@Override
+	public String toString() {
+		return "Player [id=" + id + ", name=" + name + ", score=" + score + ", status=" + status + ", gesture="
+				+ gesture + "]";	
+	}
+	
 	public long getId() {
 		return id;
 	}
@@ -30,23 +55,14 @@ public class Player {
 	public void setStatus(PlayerStatus status) {
 		this.status = status;
 	}
-	public Gesture getGesture() {
+	public HandGesture getGesture() {
 		return gesture;
 	}
-	public void setGesture(Gesture gesture) {
+	public void setGesture(HandGesture gesture) {
 		this.gesture = gesture;
 	}
-	public void reset() {
-		if(this.status==PlayerStatus.GESTURED) {
-			this.status=PlayerStatus.JOINED;
-			this.gesture=null;
-		}
-	}
-	@Override
-	public String toString() {
-		return "Player [id=" + id + ", name=" + name + ", score=" + score + ", status=" + status + ", gesture="
-				+ gesture + "]";
-	}
+	
+
 	
 	
 	

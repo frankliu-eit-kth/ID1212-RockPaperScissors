@@ -44,13 +44,27 @@ public enum Command {
      * No command was specified. This means the entire command line is interpreted as user input
      */
     NO_COMMAND,
-    /*
-     * Start a new game
+    
+    /**
+     * join the current game(after connection)
      */
-    START,
     JOIN,
+    /**
+     * ready for a new round
+     */
     READY,
+    /**
+     * rock
+     */
     ROCK,
+    /**
+     * paper
+     */
     PAPER,
+    /**
+     * scissors
+     */
     SCISSORS
+   
+    
 }
